@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<array>
+		<integer>0</integer>
+		<string>横纵消</string>
+		<string>随机三个变为横纵消</string>
+	</array>
+	<array>
+		<integer>1</integer>
+		<string>爆炸消</string>
+		<string>消除周围3X3</string>
+	</array>
+	<array>
+		<integer>2</integer>
+		<string>同色消</string>
+		<string>消除同色的所有食物</string>
+	</array>
+	<array>
+		<integer>3</integer>
+		<string>大风暴</string>
+		<string>重新生成游戏界面</string>
+	</array>
+	<array>
+		<integer>4</integer>
+		<string>任意门</string>
+		<string>交换任意两个食物</string>
+	</array>
+	<array>
+		<integer>5</integer>
+		<string>时钟</string>
+		<string>限时关卡使用后随机增加10s-20s时间</string>
+	</array>
+	<array>
+		<integer>6</integer>
+		<string>辣椒</string>
+		<string>运送厨具关卡随机消除一列食物</string>
+	</array>
+	<array>
+		<integer>7</integer>
+		<string>大变脸</string>
+		<string>让游戏界面只剩两种食物交叉排列</string>
+	</array>
+	<array>
+		<integer>8</integer>
+		<string>狂暴</string>
+		<string>10s内每次消除都以爆炸的方式消除</string>
+	</array>
+</array>
+</plist>
