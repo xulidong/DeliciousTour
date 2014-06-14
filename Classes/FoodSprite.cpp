@@ -4,7 +4,7 @@ USING_NS_CC;
 
 #define TOTAL_FOOD (6)
 
-#define SCALE_FOOD 0.6f
+#define SCALE_FOOD 0.5f
 
 static const char *foodNormal[TOTAL_FOOD] = {
 	"sushi_1n.png",
@@ -41,6 +41,16 @@ float FoodSprite::getContentWidth()
         itemWidth = sprite->getContentSize().width;
     }
     return itemWidth*SCALE_FOOD;
+}
+
+float FoodSprite::getContentHeight()
+{
+    static float itemHeight = 0;
+    if (0 == itemHeight) {
+        Sprite *sprite = CCSprite::createWithSpriteFrameName(foodNormal[0]);
+        itemHeight = sprite->getContentSize().height;
+    }
+    return itemHeight*SCALE_FOOD;
 }
 
 FoodSprite::FoodSprite()

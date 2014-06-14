@@ -22,12 +22,10 @@ DropState::~DropState()
 
 void DropState::execute(PlayLayer* playLayer)
 {
-    if(playLayer->getCanDrop())
-    {
-        playLayer->onDropState();
+    if(playLayer->getCanDrop()){
+        playLayer->onStateDrop();
     }
-    else
-    {
+    else{
         playLayer->getFSM()->changeState(new ReadyState());
     }
 }

@@ -13,12 +13,6 @@ RemoveState::~RemoveState()
 
 void RemoveState::execute(PlayLayer* playLayer)
 {
-    if(playLayer->getCanRemove())
-    {
-        playLayer->onRemoveState();
-    }
-    else
-    {
-        playLayer->getFSM()->changeState(new ReadyState());
-    }
+    playLayer->onStateRemove();
+    playLayer->getFSM()->changeState(new DropState());
 }

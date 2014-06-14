@@ -1,7 +1,23 @@
 #include "MainScene.h"
 #include "PlayScene.h"
-#include "MapReader.h"
 #include "PlayerData.h"
+
+void mixedSprites(Sprite* taget, Sprite* source)
+{
+    auto pRT = RenderTexture::create(640, 1136);
+    pRT->setPosition(SIZE_MID_POS);
+    
+    BlendFunc func1 = {GL_ZERO, GL_ONE_MINUS_CONSTANT_ALPHA};
+    BlendFunc func2 = {GL_DST_ALPHA, GL_ZERO};
+    
+    taget->setBlendFunc(func1);
+    source->setBlendFunc(func2);
+    
+    pRT->begin();
+    taget->visit();
+    source->visit();
+    pRT->end();
+}
 
 Scene* MainScene::createScene()
 {
@@ -41,8 +57,6 @@ bool MainScene::init()
                                                NULL)
                              );
         
-        MapReader::getInstance()->readDataOf(1);
-        
         m_lifeLbl = Label::createWithSystemFont("Play","Arial",24);
         m_lifeLbl->setPosition(Point(SIZE_W*0.85,SIZE_H*0.8));
         m_lifeLbl->setTextColor(Color4B(255,0,0,255));
@@ -55,18 +69,20 @@ bool MainScene::init()
         m_lifeStateLbl->setString("Time");
         addChild(m_lifeStateLbl);
         
-//        auto layermap = MapLayer::create();
-//        addChild(layermap);
-        
-//        auto layershop = ShopLayer::create();
-//        addChild(layershop);
-        
-//        auto layerbag = BagLayer::createLayer();
-//        addChild(layerbag);
-        
         auto listener = EventListenerTouchOneByOne::create();
         listener->onTouchBegan = CC_CALLBACK_2(MainScene::onTouchBegan,this);
         _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+        
+        auto sprt1 = Sprite::create("Icon.png");
+        sprt1->setPosition(Point(SIZE_W*0.5, SIZE_H*0.8));
+        addChild(sprt1);
+        
+        auto sprt2 = Sprite::create("powered.png");
+        sprt2->setPosition(SIZE_MID_POS);
+        addChild(sprt2);
+        
+        mixedSprites(sprt1,sprt2);
+        
         
         
         bRet = true;

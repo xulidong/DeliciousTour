@@ -3,6 +3,8 @@
 
 #include "CommonHeader.h"
 
+#define MAP_INSTANCE MapReader::getInstance()
+
 enum eModel{
     eModel_None,
     eModel_Score,
@@ -30,6 +32,10 @@ public:
     // 评星标准
     
     // 地图
+    CC_SYNTHESIZE(int, m_width, Width);
+    CC_SYNTHESIZE(int, m_height, Height);
+    int* m_vFood;
+    int* m_vTile;
     
 private:
     MapReader();

@@ -7,60 +7,48 @@
 
 class FoodSprite;
 
-class PlayLayer : public Layer
+class PlayLayer : public LayerColor
 {
 public:
     PlayLayer();
     ~PlayLayer();
-    static PlayLayer* createLayer();
-    CREATE_FUNC(PlayLayer);
+    static PlayLayer* createLayer(int level);
+    bool init(int level);
     
-    virtual bool init() override;
-    virtual void update(float dt) override;
-    virtual bool onTouchBegan(Touch *touch, Event *unused) override;
-    virtual void onTouchMoved(Touch *touch, Event *unused) override;
+    void update(float dt);
+    bool onTouchBegan(Touch *touch, Event *unused);
+    void onTouchMoved(Touch *touch, Event *unused);
     
     //**************************************************************************
     // onState
     //**************************************************************************
     FSM* getFSM();
-    void onReadyState();
-    CC_SYNTHESIZE(bool, m_canDrop, CanDrop);// 是否有空缺需要填补
-    void onDropState();
-    CC_SYNTHESIZE(bool, m_canRemove, CanRemove);// 是否有空缺需要填补
-    void onRemoveState();
+    void onStateReady();
+    void onStateDrop();
+    void onStateRemove();
+    
+    CC_SYNTHESIZE(bool, m_canRemove, CanRemove);// 是否可以移动
+    CC_SYNTHESIZE(int, m_level, Level);         // 当前关卡
     
 private:
-    FSM* mFSM;
-    
-    SpriteBatchNode *spriteSheet;
-    FoodSprite **m_matrix;
-    int m_width;
-    int m_height;
-    
-    float m_matrixLeftBottomX;
-    float m_matrixLeftBottomY;
-    
-    FoodSprite *m_srcFood;
-    FoodSprite *m_destFood;
-    
-    bool m_isTouchEnable;// is need to deal with touch event
-    bool m_isAnimationing;
-    bool m_movingVertical;// true: 4消除产生纵向炸弹.  false: 4消除产生横向炸弹.
-    
-    Point positionOfItem(int row, int col);
-    FoodSprite *foodOfPoint(Point *point);
-    
     void initMatrix();
-    void createAndDropFood(int row, int col);
+    
+    void createAndDropFood(int row, int col, bool isInit = false);
+    void createAndAddTiles(int row, int col);
+    
+    void getDestFood(Touch *touch);
     void getColChain(FoodSprite *food, std::list<FoodSprite *> &chainList);
     void getRowChain(FoodSprite *food, std::list<FoodSprite *> &chainList);
+    
     void explodeEndCallback(Node *node);
     void explodeFood(FoodSprite *food);
     
-    // line消除的动画
+    // clean line animation
     void explodeSpecialHor(Point point);
     void explodeSpecialVer(Point point);
+    
+    Point positionOfItem(int row, int col);
+    FoodSprite *foodOfPoint(Point *point);
     
     void swapFood();
     
@@ -73,6 +61,28 @@ private:
     void markRemoveHor(FoodSprite *food);
     void markRemoveVer(FoodSprite *food);
     void markRemove(FoodSprite *food);
+    
+    FSM* mFSM;
+    
+    SpriteBatchNode *spriteSheet;
+    FoodSprite **m_matrix;
+    
+    int m_width;
+    int m_height;
+    
+    // start of matrix position
+    float m_matrixLeftBottomX;
+    float m_matrixLeftBottomY;
+    
+    // use to change food
+    FoodSprite *m_srcFood;
+    FoodSprite *m_destFood;
+    
+    bool m_isTouchEnable;// is need to deal with touch event
+    bool m_isAnimationing;
+    bool m_movingVertical;// true: 4消除产生纵向炸弹.  false: 4消除产生横向炸弹.
+    
+    Node* m_node;
 };
 
 #endif /* defined(__PlayLayer_H__) */

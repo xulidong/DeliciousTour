@@ -403,6 +403,8 @@
 		15AA9C4015B7EC450033D6C2 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				1AFAF8B316D35DE700DB1158 /* AppDelegate.cpp */,
+				1AFAF8B416D35DE700DB1158 /* AppDelegate.h */,
 				9A94C5021945938A002CB79B /* BagData.cpp */,
 				9A94C5031945938A002CB79B /* BagData.h */,
 				9A94C5041945938A002CB79B /* BaseState.cpp */,
@@ -454,8 +456,6 @@
 				9A94C5321945938A002CB79B /* WelcomeScene.h */,
 				9A94C5331945938A002CB79B /* WinState.cpp */,
 				9A94C5341945938A002CB79B /* WinState.h */,
-				1AFAF8B316D35DE700DB1158 /* AppDelegate.cpp */,
-				1AFAF8B416D35DE700DB1158 /* AppDelegate.h */,
 			);
 			name = Classes;
 			path = ../classes;

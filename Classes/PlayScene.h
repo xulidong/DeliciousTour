@@ -17,6 +17,8 @@ public:
     CREATE_FUNC(PlayScene);
     
 private:
+    void changeScene();
+    
     PlayLayer* mPlayLayer;
 };
 

@@ -42,6 +42,7 @@ public:
     FoodSprite();
 	static FoodSprite *create(int row, int col);
     static float getContentWidth();
+    static float getContentHeight();
     
     CC_SYNTHESIZE(int, m_row, Row);
     CC_SYNTHESIZE(int, m_col, Col);

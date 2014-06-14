@@ -1,10 +1,10 @@
 #include "PlayLayer.h"
 #include "FoodSprite.h"
+#include "MapReader.h"
 
-#define MATRIX_WIDTH (9)
-#define MATRIX_HEIGHT (9)
-
-#define FOOD_GAP (1)
+#define FOOD_GAP                (1)
+#define FULL_DROP_TIME          (4)
+#define DROP_TIME(distance)     (FULL_DROP_TIME*(distance)/SIZE_H)
 
 PlayLayer::PlayLayer()
 : spriteSheet(NULL)
@@ -13,7 +13,6 @@ PlayLayer::PlayLayer()
 , m_height(0)
 , m_matrixLeftBottomX(0)
 , m_matrixLeftBottomY(0)
-, m_canDrop(false)
 , m_canRemove(false)
 , m_isAnimationing(true)//start with drop animation
 , m_isTouchEnable(true)
@@ -21,6 +20,7 @@ PlayLayer::PlayLayer()
 , m_destFood(NULL)
 , m_movingVertical(true)//drop animation is vertical
 {
+    
 }
 
 PlayLayer::~PlayLayer()
@@ -29,10 +29,10 @@ PlayLayer::~PlayLayer()
     CC_SAFE_DELETE(mFSM);
 }
 
-PlayLayer* PlayLayer::createLayer()
+PlayLayer* PlayLayer::createLayer(int level)
 {
     auto layer = new PlayLayer();
-    if (layer && layer->init()) {
+    if (layer && layer->init(level)) {
         layer->autorelease();
     }
     else
@@ -42,23 +42,21 @@ PlayLayer* PlayLayer::createLayer()
     return layer;
 }
 
-bool PlayLayer::init()
+bool PlayLayer::init(int level)
 {
-    if (!Layer::init()) {
+    if (!LayerColor::initWithColor(Color4B(255, 255, 255,0))) {
         return false;
     }
     
-//    auto background = Sprite::create("gamebg.png");
-//    background->setAnchorPoint(Point(0, 1));
-//    background->setPosition(Point(0, SIZE_H));
-//    addChild(background);
+    m_level = level;
     
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("sushi.plist");
     spriteSheet = SpriteBatchNode::create("sushi.pvr.ccz");
     addChild(spriteSheet);
     
-    m_width = MATRIX_WIDTH;
-    m_height = MATRIX_HEIGHT;
+    MAP_INSTANCE->readDataOf(m_level);
+    m_width = MAP_INSTANCE->getWidth();
+    m_height = MAP_INSTANCE->getHeight();
     
     m_matrixLeftBottomX = (SIZE_W - FoodSprite::getContentWidth() * m_width - (m_width - 1) * FOOD_GAP) / 2;
     m_matrixLeftBottomY = (SIZE_H - FoodSprite::getContentWidth() * m_height - (m_height - 1) * FOOD_GAP) / 2;
@@ -67,8 +65,23 @@ bool PlayLayer::init()
     m_matrix = (FoodSprite **)malloc(arraySize);
     memset((void*)m_matrix, 0, arraySize);
     
+    // add mask
+    auto clip = ClippingNode::create();
+    clip->setInverted(true);
+    clip->setAlphaThreshold(1);
+    this->addChild(clip);
+    
+    auto back = Sprite::create("background.png");//LayerColor::create(Color4B(128,128,128,255));
+    back->ignoreAnchorPointForPosition(false);
+    back->setAnchorPoint(Point(0, 1));
+    back->setPosition(Point(0, SIZE_H));
+    clip->addChild(back);
+    
+    m_node = Node::create();
+    clip->setStencil(m_node);
+    
+    // must initMatrix before start FSM
     initMatrix();
-    // 界面初始化完成之后，才能启动状态机
     mFSM = FSM::createFSM(this);
     CC_SAFE_RETAIN(mFSM);
     mFSM->changeState(new ReadyState());
@@ -86,7 +99,8 @@ void PlayLayer::initMatrix()
 {
     for (int row = 0; row < m_height; row++) {
 		for (int col = 0; col < m_width; col++) {
-            createAndDropFood(row, col);
+            createAndAddTiles(row, col);
+            createAndDropFood(row, col, true);
         }
     }
 }
@@ -104,6 +118,7 @@ bool PlayLayer::onTouchBegan(Touch *touch, Event *unused)
         auto location = touch->getLocation();
         m_srcFood = foodOfPoint(&location);
     }
+    
     return m_isTouchEnable;
 }
 
@@ -113,73 +128,8 @@ void PlayLayer::onTouchMoved(Touch *touch, Event *unused)
         return;
     }
     
-    int row = m_srcFood->getRow();
-    int col = m_srcFood->getCol();
-    
-    auto halfFoodWidth = m_srcFood->getContentSize().width / 2;
-    auto halfFoodHeight = m_srcFood->getContentSize().height / 2;
-    
-    auto  upRect = Rect(m_srcFood->getPositionX() - halfFoodWidth,
-                        m_srcFood->getPositionY() + halfFoodHeight,
-                        m_srcFood->getContentSize().width,
-                        m_srcFood->getContentSize().height);
-    
-    auto location = touch->getLocation();
-    
-    if (upRect.containsPoint(location)) {
-        row++;
-        if (row < m_height) {
-            m_destFood = m_matrix[row * m_width + col];
-        }
-        m_movingVertical = true;
-        swapFood();
-        return;
-    }
-    
-    auto  downRect = Rect(m_srcFood->getPositionX() - halfFoodWidth,
-                        m_srcFood->getPositionY() - (halfFoodHeight * 3),
-                        m_srcFood->getContentSize().width,
-                        m_srcFood->getContentSize().height);
-    
-    if (downRect.containsPoint(location)) {
-        row--;
-        if (row >= 0) {
-            m_destFood = m_matrix[row * m_width + col];
-        }
-        m_movingVertical = true;
-        swapFood();
-        return;
-    }
-    
-    auto  leftRect = Rect(m_srcFood->getPositionX() - (halfFoodWidth * 3),
-                          m_srcFood->getPositionY() - halfFoodHeight,
-                          m_srcFood->getContentSize().width,
-                          m_srcFood->getContentSize().height);
-    
-    if (leftRect.containsPoint(location)) {
-        col--;
-        if (col >= 0) {
-            m_destFood = m_matrix[row * m_width + col];
-        }
-        m_movingVertical = false;
-        swapFood();
-        return;
-    }
-    
-    auto  rightRect = Rect(m_srcFood->getPositionX() + halfFoodWidth,
-                          m_srcFood->getPositionY() - halfFoodHeight,
-                          m_srcFood->getContentSize().width,
-                          m_srcFood->getContentSize().height);
-    
-    if (rightRect.containsPoint(location)) {
-        col++;
-        if (col < m_width) {
-            m_destFood = m_matrix[row * m_width + col];
-        }
-        m_movingVertical = false;
-        swapFood();
-        return;
-    }
+    getDestFood(touch);
+    swapFood();
 }
 
 void PlayLayer::update(float dt)
@@ -228,7 +178,7 @@ void PlayLayer::swapFood()
     m_destFood->setRow(tmpRow);
     m_destFood->setCol(tmpCol);
     
-    // 2.check for remove able
+    // 2.check remove able for m_srcFood and m_destFood in both dirctions
     std::list<FoodSprite *> colChainListOfFirst;
     getColChain(m_srcFood, colChainListOfFirst);
     
@@ -254,6 +204,7 @@ void PlayLayer::swapFood()
     // no chain, swap and back
     else
     {
+        // swap back in matrix
         m_matrix[m_srcFood->getRow() * m_width + m_srcFood->getCol()] = m_destFood;
         m_matrix[m_destFood->getRow() * m_width + m_destFood->getCol()] = m_srcFood;
         tmpRow = m_srcFood->getRow();
@@ -516,27 +467,37 @@ void PlayLayer::markRemove(FoodSprite *food)
 // Fill Function
 //******************************************************************************
 #pragma mark - Fill Function
-void PlayLayer::createAndDropFood(int row, int col)
+void PlayLayer::createAndDropFood(int row, int col, bool isInit)
 {
     FoodSprite *food = FoodSprite::create(row, col);
-    
-    // create animation
     Point endPosition = positionOfItem(row, col);
-    Point startPosition = Point(endPosition.x, endPosition.y + SIZE_H / 2);
+    Point startPosition = isInit ? Point(endPosition.x, endPosition.y + SIZE_H/2) : positionOfItem(m_height, col);
     food->setPosition(startPosition);
-    float speed = startPosition.y / (1.5 * SIZE_H);
-    food->runAction(MoveTo::create(speed, endPosition));
-    // add to BatchNode
-    spriteSheet->addChild(food);
+    spriteSheet->addChild(food);// add to BatchNode
+    
+    float dt = isInit ? DROP_TIME(SIZE_H/2) : DROP_TIME(startPosition.y - endPosition.y);
+    food->runAction(MoveTo::create(dt, endPosition));
 
     m_matrix[row * m_width + col] = food;
+}
+
+void PlayLayer::createAndAddTiles(int row, int col){
+    
+    auto tile = Sprite::create("black.png");
+    tile->setScale(8.0);
+    tile->setPosition(positionOfItem(row, col));
+    m_node->addChild(tile);
+    
+    auto tile2 = Sprite::create("black.png");
+    tile2->setScale(4.3f);
+    tile2->setPosition(positionOfItem(row, col));
+    addChild(tile2,-1);
 }
 
 //******************************************************************************
 // Mini Function
 //******************************************************************************
 #pragma mark - Mini Function
-
 Point PlayLayer::positionOfItem(int row, int col)
 {
     float x = m_matrixLeftBottomX + (FoodSprite::getContentWidth() + FOOD_GAP) * col + FoodSprite::getContentWidth() / 2;
@@ -564,6 +525,69 @@ FoodSprite *PlayLayer::foodOfPoint(Point *point)
     return NULL;
 }
 
+void PlayLayer::getDestFood(Touch *touch)
+{
+    int row = m_srcFood->getRow();
+    int col = m_srcFood->getCol();
+    
+    auto location = touch->getLocation();
+    auto halfFoodWidth = m_srcFood->getContentSize().width / 2;
+    auto halfFoodHeight = m_srcFood->getContentSize().height / 2;
+    
+    // check four dircions up, down, left and right, get the m_dstFood
+    auto  upRect = Rect(m_srcFood->getPositionX() - halfFoodWidth,
+                        m_srcFood->getPositionY() + halfFoodHeight,
+                        m_srcFood->getContentSize().width,
+                        m_srcFood->getContentSize().height);
+    if (upRect.containsPoint(location)) {
+        row++;
+        if (row < m_height) {
+            m_destFood = m_matrix[row * m_width + col];
+        }
+        m_movingVertical = true;
+        return;
+    }
+    
+    auto  downRect = Rect(m_srcFood->getPositionX() - halfFoodWidth,
+                          m_srcFood->getPositionY() - (halfFoodHeight * 3),
+                          m_srcFood->getContentSize().width,
+                          m_srcFood->getContentSize().height);
+    if (downRect.containsPoint(location)) {
+        row--;
+        if (row >= 0) {
+            m_destFood = m_matrix[row * m_width + col];
+        }
+        m_movingVertical = true;
+        return;
+    }
+    
+    auto  leftRect = Rect(m_srcFood->getPositionX() - (halfFoodWidth * 3),
+                          m_srcFood->getPositionY() - halfFoodHeight,
+                          m_srcFood->getContentSize().width,
+                          m_srcFood->getContentSize().height);
+    if (leftRect.containsPoint(location)) {
+        col--;
+        if (col >= 0) {
+            m_destFood = m_matrix[row * m_width + col];
+        }
+        m_movingVertical = false;
+        return;
+    }
+    
+    auto  rightRect = Rect(m_srcFood->getPositionX() + halfFoodWidth,
+                           m_srcFood->getPositionY() - halfFoodHeight,
+                           m_srcFood->getContentSize().width,
+                           m_srcFood->getContentSize().height);
+    if (rightRect.containsPoint(location)) {
+        col++;
+        if (col < m_width) {
+            m_destFood = m_matrix[row * m_width + col];
+        }
+        m_movingVertical = false;
+        return;
+    }
+}
+
 //******************************************************************************
 // FSM
 //******************************************************************************
@@ -573,7 +597,7 @@ FSM* PlayLayer::getFSM()
     return mFSM;
 }
 
-void PlayLayer::onReadyState()
+void PlayLayer::onStateReady()
 {
     CCLOG("ready");
     FoodSprite *food;
@@ -635,7 +659,7 @@ void PlayLayer::onReadyState()
                 markRemove(food);
             }
             
-            // 如何是自由掉落产生的4消, 取最后一个变化为特殊寿司
+            // 如果是自由掉落产生的4消, 取最后一个变化为特殊寿司
             if (!isSetedIgnoreCheck && longerList.size() > 3) {
                 food->setIgnoreCheck(true);
                 food->setIsNeedRemove(false);
@@ -645,7 +669,7 @@ void PlayLayer::onReadyState()
     }
 }
 
-void PlayLayer::onDropState()
+void PlayLayer::onStateDrop()
 {
     CCLOG("drop");
     // reset moving direction flag
@@ -659,12 +683,13 @@ void PlayLayer::onDropState()
     FoodSprite *food = NULL;
     for (int col = 0; col < m_width; col++) {
         int removedFoodOfCol = 0;
-        // from buttom to top
+        // from bottom to top
         for (int row = 0; row < m_height; row++) {
             food = m_matrix[row * m_width + col];
             if (NULL == food) {
                 removedFoodOfCol++;
-            } else {
+            }
+            else {
                 if (removedFoodOfCol > 0) {
                     // every item have its own drop distance
                     int newRow = row - removedFoodOfCol;
@@ -674,9 +699,9 @@ void PlayLayer::onDropState()
                     // move to new position
                     Point startPosition = food->getPosition();
                     Point endPosition = positionOfItem(newRow, col);
-                    float speed = (startPosition.y - endPosition.y) / SIZE_H;
-                    food->stopAllActions();// must stop pre drop action
-                    food->runAction(CCMoveTo::create(speed, endPosition));
+                    float dt = DROP_TIME(startPosition.y - endPosition.y);
+                    food->stopAllActions();
+                    food->runAction(MoveTo::create(dt, endPosition));
                     // set the new row to item
                     food->setRow(newRow);
                 }
@@ -695,15 +720,12 @@ void PlayLayer::onDropState()
     }
     
     free(colEmptyInfo);
-    
-    m_canDrop = false;
 }
 
-void PlayLayer::onRemoveState()
+void PlayLayer::onStateRemove()
 {
     CCLOG("remove");
     
-    // make sequence remove
     m_isAnimationing = true;
     
     for (int i = 0; i < m_height * m_width; i++)
@@ -714,8 +736,8 @@ void PlayLayer::onRemoveState()
         }
         
         if (food->getIsNeedRemove()) {
-            m_canDrop = true;//需要掉落
-            // 检查类型，并播放一行消失的动画
+            
+            // 1. line
             if(food->getFoodState() == FOOD_STATE_HORIZONTAL)
             {
                 explodeSpecialHor(food->getPosition());
@@ -729,9 +751,8 @@ void PlayLayer::onRemoveState()
                 // 功能待加入
             }
             
-            // 减少一条生命
+            // 2. self
             food->removeOneLife();
-            
             if (food->getLife() == 0) {
                 explodeFood(food);
             }
