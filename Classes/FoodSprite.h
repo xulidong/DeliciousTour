@@ -25,29 +25,40 @@
 
 USING_NS_CC;
 
-typedef enum {
+enum class FoodState{
     FOOD_STATE_NONE,
-    FOOD_STATE_NORMAL = 0,
+    FOOD_STATE_NORMAL = FOOD_STATE_NONE,
     FOOD_STATE_HORIZONTAL,
     FOOD_STATE_VERTICAL,
     FOOD_STATE_EXPLODE,
     FOOD_STATE_SAME,
     FOOD_STATE_BRING,
     FOOD_STATE_MAX
-} FoodState;
+} ;
+
+enum class FoodType{
+    FOOD_TYPE_NONE,
+    FOOD_TYPE_1 = FOOD_TYPE_NONE,
+    FOOD_TYPE_2,
+    FOOD_TYPE_3,
+    FOOD_TYPE_4,
+    FOOD_TYPE_5,
+    FOOD_TYPE_6,
+    FOOD_TYPE_MAX
+};
 
 class FoodSprite :  public Sprite
 {
 public:
     FoodSprite();
-	static FoodSprite *create(int row, int col);
+	static FoodSprite *create(FoodType type,int row, int col);
     static float getContentWidth();
     static float getContentHeight();
     
     CC_SYNTHESIZE(int, m_row, Row);
     CC_SYNTHESIZE(int, m_col, Col);
     
-    CC_SYNTHESIZE(int, m_imgIndex, ImgIndex);
+    CC_SYNTHESIZE(FoodType, m_foodType, FoodType);
     
     CC_SYNTHESIZE_READONLY(FoodState, m_foodState, FoodState);
     void setFoodState(FoodState mode);

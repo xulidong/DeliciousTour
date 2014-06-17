@@ -4,33 +4,15 @@ USING_NS_CC;
 
 #define TOTAL_FOOD (6)
 
-#define SCALE_FOOD 0.5f
+#define SCALE_FOOD 1.0f
 
-static const char *foodNormal[TOTAL_FOOD] = {
-	"sushi_1n.png",
-	"sushi_2n.png",
-	"sushi_3n.png",
-	"sushi_4n.png",
-	"sushi_5n.png",
-    "sushi_6n.png"
-};
-
-static const char *foodVertical[TOTAL_FOOD] = {
-	"sushi_1v.png",
-	"sushi_2v.png",
-	"sushi_3v.png",
-	"sushi_4v.png",
-	"sushi_5v.png",
-    "sushi_6v.png"
-};
-
-static const char *foodHorizontal[TOTAL_FOOD] = {
-	"sushi_1h.png",
-	"sushi_2h.png",
-	"sushi_3h.png",
-	"sushi_4h.png",
-	"sushi_5h.png",
-    "sushi_6h.png"
+static const std::string foodNormal[TOTAL_FOOD] = {
+	"Blue_Vert0.png",
+	"Green_Vert0.png",
+	"Orange_Vert0.png",
+	"Pink_Vert0.png",
+	"Purple_Vert0.png",
+    "Yellow_Vert0.png"
 };
 
 float FoodSprite::getContentWidth()
@@ -56,23 +38,25 @@ float FoodSprite::getContentHeight()
 FoodSprite::FoodSprite()
 : m_col(0)
 , m_row(0)
-, m_imgIndex(0)
+, m_foodType(FoodType::FOOD_TYPE_NONE)
 , m_life(1)
 , m_isNeedRemove(false)
 , m_ignoreCheck(false)
-, m_foodState(FOOD_STATE_NONE)
+, m_foodState(FoodState::FOOD_STATE_NONE)
 {
 }
 
-FoodSprite *FoodSprite::create(int row, int col)
+FoodSprite *FoodSprite::create(FoodType type, int row, int col)
 {
 	FoodSprite *food = new FoodSprite();
     food->setScale(SCALE_FOOD);
 	food->m_row = row;
 	food->m_col = col;
-    food->m_imgIndex = arc4random() % TOTAL_FOOD;
-    food->initWithSpriteFrameName(foodNormal[food->m_imgIndex]);
+    food->m_foodType = type;
+    std::string file = foodNormal[(int)food->m_foodType];
+    food->initWithSpriteFrameName(file);
 	food->autorelease();
+    
 	return food;
 }
 
@@ -80,21 +64,23 @@ void FoodSprite::setFoodState(FoodState state)
 {
     m_foodState = state;
     
-    SpriteFrame *frame = NULL;
+//    SpriteFrame *frame = NULL;
     switch (state) {
-        case FOOD_STATE_HORIZONTAL:
-            frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(foodHorizontal[m_imgIndex]);
+        case FoodState::FOOD_STATE_HORIZONTAL:
+            
             break;
-        case FOOD_STATE_VERTICAL:
-            frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(foodVertical[m_imgIndex]);
+        case FoodState::FOOD_STATE_VERTICAL:
+//            frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(foodVertical[(int)m_foodType]);
             break;
-        case FOOD_STATE_EXPLODE:
+        case FoodState::FOOD_STATE_SAME:
+            
+        case FoodState::FOOD_STATE_EXPLODE:
             // 缺少图片
         default:
             return;
     }
     
-    setDisplayFrame(frame);
+//    setDisplayFrame(frame);
 }
 
 void FoodSprite::removeOneLife(int count)

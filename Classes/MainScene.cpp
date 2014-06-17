@@ -111,7 +111,6 @@ void MainScene::update(float fDelta)
     m_lifeStateLbl->setString(strState);
 }
 
-//触摸事件
 bool MainScene::onTouchBegan(Touch * touch,Event * pEvent)
 {
     //获得触摸点坐标

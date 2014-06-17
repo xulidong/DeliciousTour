@@ -34,6 +34,7 @@ public:
     // 地图
     CC_SYNTHESIZE(int, m_width, Width);
     CC_SYNTHESIZE(int, m_height, Height);
+    
     int* m_vFood;
     int* m_vTile;
     

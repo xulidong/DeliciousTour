@@ -1,6 +1,6 @@
 #include "PlayLayer.h"
-#include "FoodSprite.h"
 #include "MapReader.h"
+#include "FoodSprite.h"
 
 #define FOOD_GAP                (1)
 #define FULL_DROP_TIME          (4)
@@ -50,8 +50,9 @@ bool PlayLayer::init(int level)
     
     m_level = level;
     
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("sushi.plist");
-    spriteSheet = SpriteBatchNode::create("sushi.pvr.ccz");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("monsters.plist", "monsters.png");
+    
+    spriteSheet = SpriteBatchNode::create("monsters.png");
     addChild(spriteSheet);
     
     MAP_INSTANCE->readDataOf(m_level);
@@ -100,7 +101,8 @@ void PlayLayer::initMatrix()
     for (int row = 0; row < m_height; row++) {
 		for (int col = 0; col < m_width; col++) {
             createAndAddTiles(row, col);
-            createAndDropFood(row, col, true);
+            int idx = row * m_width + col;
+            createAndDropFood(getFoodTypeByIndex(idx) ,row, col, true);
         }
     }
 }
@@ -236,7 +238,7 @@ void PlayLayer::getColChain(FoodSprite *food, std::list<FoodSprite *> &chainList
     while (neighborCol >= 0) {
         FoodSprite *neighborFood = m_matrix[food->getRow() * m_width + neighborCol];
         if (neighborFood
-            && (neighborFood->getImgIndex() == food->getImgIndex())
+            && (neighborFood->getFoodType() == food->getFoodType())
             && !neighborFood->getIsNeedRemove()
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
@@ -250,7 +252,7 @@ void PlayLayer::getColChain(FoodSprite *food, std::list<FoodSprite *> &chainList
     while (neighborCol < m_width) {
         FoodSprite *neighborFood = m_matrix[food->getRow() * m_width + neighborCol];
         if (neighborFood
-            && (neighborFood->getImgIndex() == food->getImgIndex())
+            && (neighborFood->getFoodType() == food->getFoodType())
             && !neighborFood->getIsNeedRemove()
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
@@ -270,7 +272,7 @@ void PlayLayer::getRowChain(FoodSprite *food, std::list<FoodSprite *> &chainList
     while (neighborRow >= 0) {
         FoodSprite *neighborFood = m_matrix[neighborRow * m_width + food->getCol()];
         if (neighborFood
-            && (neighborFood->getImgIndex() == food->getImgIndex())
+            && (neighborFood->getFoodType() == food->getFoodType())
             && !neighborFood->getIsNeedRemove()
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
@@ -284,7 +286,7 @@ void PlayLayer::getRowChain(FoodSprite *food, std::list<FoodSprite *> &chainList
     while (neighborRow < m_height) {
         FoodSprite *neighborFood = m_matrix[neighborRow * m_width + food->getCol()];
         if (neighborFood
-            && (neighborFood->getImgIndex() == food->getImgIndex())
+            && (neighborFood->getFoodType() == food->getFoodType())
             && !neighborFood->getIsNeedRemove()
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
@@ -400,7 +402,7 @@ void PlayLayer::markRemoveHor(FoodSprite *food)
         }
         
         switch (tmp->getFoodState()) {
-            case FOOD_STATE_NORMAL:
+            case FoodState::FOOD_STATE_NORMAL:
                 tmp->setIsNeedRemove(true);
                 break;
                 
@@ -420,7 +422,7 @@ void PlayLayer::markRemoveVer(FoodSprite *food)
         }
         
         switch (tmp->getFoodState()) {
-            case FOOD_STATE_NORMAL:
+            case FoodState::FOOD_STATE_NORMAL:
                 tmp->setIsNeedRemove(true);
                 break;
                 
@@ -444,19 +446,19 @@ void PlayLayer::markRemove(FoodSprite *food)
     
     switch (food->getFoodState())
     {
-        case FOOD_STATE_VERTICAL:
+        case FoodState::FOOD_STATE_VERTICAL:
             markRemoveVer(food);
             break;
             
-        case FOOD_STATE_HORIZONTAL:
+        case FoodState::FOOD_STATE_HORIZONTAL:
             markRemoveHor(food);
             break;
             
-        case FOOD_STATE_EXPLODE:
+        case FoodState::FOOD_STATE_EXPLODE:
             
-        case FOOD_STATE_SAME:
+        case FoodState::FOOD_STATE_SAME:
             
-        case FOOD_STATE_BRING:
+        case FoodState::FOOD_STATE_BRING:
             
         default:
             break;
@@ -467,9 +469,9 @@ void PlayLayer::markRemove(FoodSprite *food)
 // Fill Function
 //******************************************************************************
 #pragma mark - Fill Function
-void PlayLayer::createAndDropFood(int row, int col, bool isInit)
+void PlayLayer::createAndDropFood(FoodType type, int row, int col, bool isInit)
 {
-    FoodSprite *food = FoodSprite::create(row, col);
+    FoodSprite *food = FoodSprite::create(type, row, col);
     Point endPosition = positionOfItem(row, col);
     Point startPosition = isInit ? Point(endPosition.x, endPosition.y + SIZE_H/2) : positionOfItem(m_height, col);
     food->setPosition(startPosition);
@@ -489,7 +491,7 @@ void PlayLayer::createAndAddTiles(int row, int col){
     m_node->addChild(tile);
     
     auto tile2 = Sprite::create("black.png");
-    tile2->setScale(4.3f);
+    tile2->setScale(6.50f);
     tile2->setPosition(positionOfItem(row, col));
     addChild(tile2,-1);
 }
@@ -588,6 +590,24 @@ void PlayLayer::getDestFood(Touch *touch)
     }
 }
 
+FoodType PlayLayer::getFoodTypeRand()
+{
+    return (FoodType)CommonFunction::getRandNum((int)FoodType::FOOD_TYPE_1,
+                                                (int)FoodType::FOOD_TYPE_6);
+}
+
+FoodType PlayLayer::getFoodTypeByIndex(int idx)
+{
+    FoodType type = FoodType::FOOD_TYPE_NONE;
+    if (MAP_INSTANCE->m_vFood[idx] == 0) {
+        type = getFoodTypeRand();
+    }else{
+        type = (FoodType)MAP_INSTANCE->m_vFood[idx];
+    }
+    
+    return type;
+}
+
 //******************************************************************************
 // FSM
 //******************************************************************************
@@ -639,21 +659,34 @@ void PlayLayer::onStateReady()
             
             std::list<FoodSprite *>::iterator itList;
             bool isSetedIgnoreCheck = false;
-            for (itList = longerList.begin(); itList != longerList.end(); itList++) {
+            for (itList = longerList.begin(); itList != longerList.end(); itList++)
+            {
                 food = (FoodSprite *)*itList;
                 if (!food) {
                     continue;
                 }
                 
-                if (longerList.size() > 3) {
-                    // 4消产生特殊寿司
+                // 1 create line food
+                if (longerList.size() == 4) {
+                    
                     if (food == m_srcFood || food == m_destFood) {
                         isSetedIgnoreCheck = true;
                         food->setIgnoreCheck(true);
                         food->setIsNeedRemove(false);
-                        food->setFoodState(m_movingVertical ? FOOD_STATE_VERTICAL : FOOD_STATE_HORIZONTAL);
+                        food->setFoodState(m_movingVertical ?
+                                           FoodState::FOOD_STATE_VERTICAL :
+                                           FoodState::FOOD_STATE_HORIZONTAL);
                         continue;
                     }
+                }
+                
+                // 2 create same color food
+                if (longerList.size() == 5) {
+                    isSetedIgnoreCheck = true;
+                    food->setIgnoreCheck(true);
+                    food->setIsNeedRemove(false);
+                    food->setFoodState(FoodState::FOOD_STATE_SAME);
+                    continue;
                 }
                 
                 markRemove(food);
@@ -663,7 +696,9 @@ void PlayLayer::onStateReady()
             if (!isSetedIgnoreCheck && longerList.size() > 3) {
                 food->setIgnoreCheck(true);
                 food->setIsNeedRemove(false);
-                food->setFoodState(m_movingVertical ? FOOD_STATE_VERTICAL : FOOD_STATE_HORIZONTAL);
+                food->setFoodState(m_movingVertical ?
+                                   FoodState::FOOD_STATE_VERTICAL :
+                                   FoodState::FOOD_STATE_HORIZONTAL);
             }
         }
     }
@@ -715,7 +750,7 @@ void PlayLayer::onStateDrop()
     // 2. create new item and drop down.
     for (int col = 0; col < m_width; col++) {
         for (int row = m_height - colEmptyInfo[col]; row < m_height; row++) {
-            createAndDropFood(row, col);
+            createAndDropFood(getFoodTypeRand(),row, col);
         }
     }
     
@@ -738,15 +773,15 @@ void PlayLayer::onStateRemove()
         if (food->getIsNeedRemove()) {
             
             // 1. line
-            if(food->getFoodState() == FOOD_STATE_HORIZONTAL)
+            if(food->getFoodState() == FoodState::FOOD_STATE_HORIZONTAL)
             {
                 explodeSpecialHor(food->getPosition());
             }
-            else if (food->getFoodState() == FOOD_STATE_VERTICAL)
+            else if (food->getFoodState() == FoodState::FOOD_STATE_VERTICAL)
             {
                 explodeSpecialVer(food->getPosition());
             }
-            else if (food->getFoodState() == FOOD_STATE_EXPLODE)
+            else if (food->getFoodState() == FoodState::FOOD_STATE_EXPLODE)
             {
                 // 功能待加入
             }

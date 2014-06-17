@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "CommonHeader.h"
 #include "FSM.h"
+#include "FoodSprite.h"
 
 class FoodSprite;
 
@@ -33,7 +34,7 @@ public:
 private:
     void initMatrix();
     
-    void createAndDropFood(int row, int col, bool isInit = false);
+    void createAndDropFood(FoodType type, int row, int col, bool isInit = false);
     void createAndAddTiles(int row, int col);
     
     void getDestFood(Touch *touch);
@@ -49,6 +50,9 @@ private:
     
     Point positionOfItem(int row, int col);
     FoodSprite *foodOfPoint(Point *point);
+    
+    FoodType getFoodTypeRand();
+    FoodType getFoodTypeByIndex(int idx = 0);
     
     void swapFood();
     
