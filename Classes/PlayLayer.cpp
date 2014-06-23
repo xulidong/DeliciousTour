@@ -19,6 +19,7 @@ PlayLayer::PlayLayer()
 , m_srcFood(NULL)
 , m_destFood(NULL)
 , m_movingVertical(true)//drop animation is vertical
+, m_isSwaped(false)
 {
     
 }
@@ -98,6 +99,7 @@ bool PlayLayer::init(int level)
 
 void PlayLayer::initMatrix()
 {
+    srand(TimeManager::GetSysTimeUSec());
     for (int row = 0; row < m_height; row++) {
 		for (int col = 0; col < m_width; col++) {
             createAndAddTiles(row, col);
@@ -114,8 +116,6 @@ void PlayLayer::initMatrix()
 
 bool PlayLayer::onTouchBegan(Touch *touch, Event *unused)
 {
-    m_srcFood = NULL;
-    m_destFood = NULL;
     if (m_isTouchEnable) {
         auto location = touch->getLocation();
         m_srcFood = foodOfPoint(&location);
@@ -157,30 +157,9 @@ void PlayLayer::update(float dt)
 //******************************************************************************
 // Process Function
 //******************************************************************************
-#pragma mark - Process Function
-void PlayLayer::swapFood()
+#pragma mark - Touch Function
+bool PlayLayer::isEnableSwap()
 {
-    m_isAnimationing = true;
-    m_isTouchEnable = false;
-    if (!m_srcFood || !m_destFood) {
-        m_movingVertical = true;
-        return;
-    }
-    
-    Point posOfSrc = m_srcFood->getPosition();
-    Point posOfDest = m_destFood->getPosition();
-    
-    // 1.swap in matrix
-    m_matrix[m_srcFood->getRow() * m_width + m_srcFood->getCol()] = m_destFood;
-    m_matrix[m_destFood->getRow() * m_width + m_destFood->getCol()] = m_srcFood;
-    int tmpRow = m_srcFood->getRow();
-    int tmpCol = m_srcFood->getCol();
-    m_srcFood->setRow(m_destFood->getRow());
-    m_srcFood->setCol(m_destFood->getCol());
-    m_destFood->setRow(tmpRow);
-    m_destFood->setCol(tmpCol);
-    
-    // 2.check remove able for m_srcFood and m_destFood in both dirctions
     std::list<FoodSprite *> colChainListOfFirst;
     getColChain(m_srcFood, colChainListOfFirst);
     
@@ -193,19 +172,55 @@ void PlayLayer::swapFood()
     std::list<FoodSprite *> rowChainListOfSecond;
     getRowChain(m_destFood, rowChainListOfSecond);
     
-    float time = 0.2;
-    // 3.swap
-    // have chain, just swap
-    if ( colChainListOfFirst.size() >= 3 || rowChainListOfFirst.size() >= 3
-        || colChainListOfSecond.size() >= 3 || rowChainListOfSecond.size() >= 3)
+    
+    // same
+    if(m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME ||
+       m_destFood->getFoodType() == FoodType::FOOD_TYPE_SAME )
     {
+        return true;
+    }
+    // normal
+    else if ( colChainListOfFirst.size() >= 3 || rowChainListOfFirst.size() >= 3 ||
+             colChainListOfSecond.size() >= 3 || rowChainListOfSecond.size() >= 3) {
+        return true;
+    }
+    
+    return false;
+}
+
+void PlayLayer::swapFood()
+{
+    m_isAnimationing = true;
+    m_isTouchEnable = false;
+    if (!m_srcFood || !m_destFood) {
+        m_movingVertical = true;
+        return;
+    }
+    
+    // 1.swap in matrix
+    m_matrix[m_srcFood->getRow() * m_width + m_srcFood->getCol()] = m_destFood;
+    m_matrix[m_destFood->getRow() * m_width + m_destFood->getCol()] = m_srcFood;
+    int tmpRow = m_srcFood->getRow();
+    int tmpCol = m_srcFood->getCol();
+    m_srcFood->setRow(m_destFood->getRow());
+    m_srcFood->setCol(m_destFood->getCol());
+    m_destFood->setRow(tmpRow);
+    m_destFood->setCol(tmpCol);
+    
+    // 2.swap animation
+    float time = 0.2;
+    Point posOfSrc = m_srcFood->getPosition();
+    Point posOfDest = m_destFood->getPosition();
+    
+    // just swap
+    if(isEnableSwap()){
         m_srcFood->runAction(MoveTo::create(time, posOfDest));
         m_destFood->runAction(MoveTo::create(time, posOfSrc));
-        m_canRemove = true;
+        
+        m_isSwaped = true;
     }
-    // no chain, swap and back
-    else
-    {
+    // swap and back
+    else{
         // swap back in matrix
         m_matrix[m_srcFood->getRow() * m_width + m_srcFood->getCol()] = m_destFood;
         m_matrix[m_destFood->getRow() * m_width + m_destFood->getCol()] = m_srcFood;
@@ -222,6 +237,8 @@ void PlayLayer::swapFood()
         m_destFood->runAction(Sequence::create( MoveTo::create(time, posOfSrc),
                                           MoveTo::create(time, posOfDest),
                                           NULL));
+        m_srcFood = NULL;
+        m_destFood = NULL;
     }
 }
 
@@ -243,7 +260,8 @@ void PlayLayer::getColChain(FoodSprite *food, std::list<FoodSprite *> &chainList
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
             neighborCol--;
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -257,7 +275,8 @@ void PlayLayer::getColChain(FoodSprite *food, std::list<FoodSprite *> &chainList
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
             neighborCol++;
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -277,7 +296,8 @@ void PlayLayer::getRowChain(FoodSprite *food, std::list<FoodSprite *> &chainList
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
             neighborRow--;
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -291,7 +311,8 @@ void PlayLayer::getRowChain(FoodSprite *food, std::list<FoodSprite *> &chainList
             && !neighborFood->getIgnoreCheck()) {
             chainList.push_back(neighborFood);
             neighborRow++;
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -393,6 +414,17 @@ void PlayLayer::explodeFood(FoodSprite *food)
 // MarkRemove Function
 //******************************************************************************
 #pragma mark - MarkRemove Function
+void PlayLayer::markList(std::list<FoodSprite *> &chainList){
+    
+    std::list<FoodSprite *>::iterator itList;
+    for (itList = chainList.begin(); itList != chainList.end(); ++itList){
+        FoodSprite* tmpFood = (FoodSprite *)*itList;
+        if (tmpFood) {
+            markRemoveNormal(tmpFood);
+        }
+    }
+}
+
 void PlayLayer::markRemoveHor(FoodSprite *food)
 {
     for (int row = 0; row < m_height; row++) {
@@ -407,7 +439,7 @@ void PlayLayer::markRemoveHor(FoodSprite *food)
                 break;
                 
             default:
-                markRemove(tmp);
+                markRemoveNormal(tmp);
                 break;
         }
     }
@@ -427,13 +459,63 @@ void PlayLayer::markRemoveVer(FoodSprite *food)
                 break;
                 
             default:
-                markRemove(tmp);
+                markRemoveNormal(tmp);
                 break;
         }
     }
 }
 
-void PlayLayer::markRemove(FoodSprite *food)
+void PlayLayer::markRemoveSame(FoodSprite *food){
+    
+    if (food == NULL) {
+        return;
+    }
+    
+    markRemoveNormal(food);
+    
+    for (int i = 0; i < m_height * m_width; i++)
+    {
+        FoodSprite *tmpFood = m_matrix[i];
+        if (tmpFood && (tmpFood->getFoodType() == food->getFoodType()) &&
+            !tmpFood->getIsNeedRemove() && !tmpFood->getIgnoreCheck())
+        {
+            switch (tmpFood->getFoodState()) {
+                case FoodState::FOOD_STATE_NORMAL:
+                    tmpFood->setIsNeedRemove(true);
+                    break;
+                    
+                default:
+                    markRemoveNormal(tmpFood);
+                    break;
+            }// end switch
+        }// end if
+    }// end for
+}
+
+void PlayLayer::markRemoveExplode(FoodSprite *food){
+
+    int row = (food->getRow()-1 >= 0)?(food->getRow()-1):(food->getRow());
+    int col = (food->getCol()-1 >= 0)?(food->getCol()-1):(food->getCol());
+    for (; row < food->getRow()+1 && row < m_height ; ++row) {
+        for (;col < food->getRow()+1 && col < m_width ; ++col ) {
+            FoodSprite *tmp = m_matrix[row * m_width + col];
+            if (!tmp || tmp == food) {
+                continue;
+            }
+            switch (tmp->getFoodState()) {
+                case FoodState::FOOD_STATE_NORMAL:
+                    tmp->setIsNeedRemove(true);
+                    break;
+                    
+                default:
+                    markRemoveNormal(tmp);
+                    break;
+            }
+        }
+    }
+}
+
+void PlayLayer::markRemoveNormal(FoodSprite *food)
 {
     if (food->getIsNeedRemove()) {
         return;
@@ -444,22 +526,16 @@ void PlayLayer::markRemove(FoodSprite *food)
     
     food->setIsNeedRemove(true);
     
-    switch (food->getFoodState())
-    {
+    switch (food->getFoodState()){
         case FoodState::FOOD_STATE_VERTICAL:
             markRemoveVer(food);
             break;
-            
         case FoodState::FOOD_STATE_HORIZONTAL:
             markRemoveHor(food);
             break;
-            
         case FoodState::FOOD_STATE_EXPLODE:
-            
-        case FoodState::FOOD_STATE_SAME:
-            
-        case FoodState::FOOD_STATE_BRING:
-            
+            markRemoveExplode(food);
+            break;
         default:
             break;
     }
@@ -616,33 +692,148 @@ FSM* PlayLayer::getFSM()
 {
     return mFSM;
 }
-
-void PlayLayer::onStateReady()
+/*
+ for (int i = 0; i < m_height * m_width; i++)
+ {
+ food = m_matrix[i];
+ if (!food) {
+ continue;
+ }
+ 
+ if (food->getIsNeedRemove()) {
+ continue;// 已标记过的跳过检查
+ }
+ 
+ if (food->getIgnoreCheck()) {
+ continue;// 新变化的特殊寿司，不消除
+ }
+ 
+ // start count chain
+ std::list<FoodSprite *> colChainList;
+ getColChain(food, colChainList);
+ 
+ std::list<FoodSprite *> rowChainList;
+ getRowChain(food, rowChainList);
+ 
+ std::list<FoodSprite *> &longerList = (colChainList.size() > rowChainList.size() ) ? colChainList : rowChainList;
+ if (longerList.size() >= 3)
+ {
+ std::list<FoodSprite *>::iterator itList;
+ bool isSetedIgnoreCheck = false;
+ for (itList = longerList.begin(); itList != longerList.end(); itList++)
+ {
+ food = (FoodSprite *)*itList;
+ if (!food) {
+ continue;
+ }
+ 
+ // 1 create boom food
+ if ( colChainList.size() >= 3 && rowChainList.size() >= 3 ){
+ if (food == m_srcFood || food == m_destFood) {
+ isSetedIgnoreCheck = true;
+ food->setIgnoreCheck(true);
+ food->setIsNeedRemove(false);
+ food->setFoodState(FoodState::FOOD_STATE_EXPLODE);
+ continue;
+ }
+ }
+ // 2 create line food
+ else if (longerList.size() == 4) {
+ 
+ if (food == m_srcFood || food == m_destFood) {
+ isSetedIgnoreCheck = true;
+ food->setIgnoreCheck(true);
+ food->setIsNeedRemove(false);
+ food->setFoodState(m_movingVertical ?
+ FoodState::FOOD_STATE_VERTICAL :
+ FoodState::FOOD_STATE_HORIZONTAL);
+ continue;
+ }
+ }
+ // 3 create same color food
+ else if (longerList.size() == 5) {
+ if (food == m_srcFood || food == m_destFood) {
+ isSetedIgnoreCheck = true;
+ food->setIgnoreCheck(true);
+ food->setIsNeedRemove(false);
+ food->setFoodType(FoodType::FOOD_TYPE_SAME);
+ continue;
+ }
+ }
+ 
+ markRemoveNormal(food);
+ }
+ }
+ m_canRemove = true;
+ }
+ 
+ */
+bool PlayLayer::swapCheck()
 {
-    CCLOG("ready");
-    FoodSprite *food;
-    // 1. reset ingnore flag
-    for (int i = 0; i < m_height * m_width; i++) {
-        food = m_matrix[i];
-        if (!food) {
-            continue;
-        }
-        food->setIgnoreCheck(false);
+    
+    if (m_srcFood == NULL || m_destFood == NULL) {
+        return false;
     }
     
-    // 2. check chain
+    bool ret = false;
+    
+    // same
+    if(m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME ||
+       m_destFood->getFoodType() == FoodType::FOOD_TYPE_SAME )
+    {
+        if (m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME) {
+            markRemoveSame(m_destFood);
+        }else{
+            markRemoveSame(m_srcFood);
+        }
+        
+        ret = true;
+    }
+    
+    // normal
+    
+    // m_srcFood
+    std::list<FoodSprite *> colSrcList;
+    getColChain(m_srcFood, colSrcList);
+    if (colSrcList.size() >= 3) {
+        markList(colSrcList);
+        ret = true;
+    }
+    
+    std::list<FoodSprite *> rowSrcList;
+    getRowChain(m_srcFood, rowSrcList);
+    if (rowSrcList.size() >= 3) {
+        markList(rowSrcList);
+        ret = true;
+    }
+    
+    // m_destFood
+    std::list<FoodSprite *> colDestList;
+    getColChain(m_destFood, colDestList);
+    if (colDestList.size() >= 3) {
+        markList(colDestList);
+        ret = true;
+    }
+    
+    std::list<FoodSprite *> rowDestList;
+    getRowChain(m_destFood, rowDestList);
+    if (rowDestList.size() >= 3) {
+        markList(rowDestList);
+        ret = true;
+    }
+    
+    return ret;
+}
+
+bool PlayLayer::dropCheck(){
+    bool ret = false;
+    
+    FoodSprite* food;
     for (int i = 0; i < m_height * m_width; i++)
     {
         food = m_matrix[i];
-        if (!food) {
+        if ( !food || food->getIsNeedRemove() || food->getIgnoreCheck() ) {
             continue;
-        }
-        
-        if (food->getIsNeedRemove()) {
-            continue;// 已标记过的跳过检查
-        }
-        if (food->getIgnoreCheck()) {
-            continue;// 新变化的特殊寿司，不消除
         }
         
         // start count chain
@@ -653,53 +844,27 @@ void PlayLayer::onStateReady()
         getRowChain(food, rowChainList);
         
         std::list<FoodSprite *> &longerList = (colChainList.size() > rowChainList.size() ) ? colChainList : rowChainList;
-        if (longerList.size() >= 3)
-        {
+        if (longerList.size() >= 3){
+            markList(longerList);
+            ret = true;
+        }
+    }
+    return ret;
+}
+
+void PlayLayer::onStateReady()
+{
+    CCLOG("ready");
+
+    // 1. check remove
+    if (m_isSwaped) {
+        if (swapCheck()) {
             m_canRemove = true;
-            
-            std::list<FoodSprite *>::iterator itList;
-            bool isSetedIgnoreCheck = false;
-            for (itList = longerList.begin(); itList != longerList.end(); itList++)
-            {
-                food = (FoodSprite *)*itList;
-                if (!food) {
-                    continue;
-                }
-                
-                // 1 create line food
-                if (longerList.size() == 4) {
-                    
-                    if (food == m_srcFood || food == m_destFood) {
-                        isSetedIgnoreCheck = true;
-                        food->setIgnoreCheck(true);
-                        food->setIsNeedRemove(false);
-                        food->setFoodState(m_movingVertical ?
-                                           FoodState::FOOD_STATE_VERTICAL :
-                                           FoodState::FOOD_STATE_HORIZONTAL);
-                        continue;
-                    }
-                }
-                
-                // 2 create same color food
-                if (longerList.size() == 5) {
-                    isSetedIgnoreCheck = true;
-                    food->setIgnoreCheck(true);
-                    food->setIsNeedRemove(false);
-                    food->setFoodState(FoodState::FOOD_STATE_SAME);
-                    continue;
-                }
-                
-                markRemove(food);
-            }
-            
-            // 如果是自由掉落产生的4消, 取最后一个变化为特殊寿司
-            if (!isSetedIgnoreCheck && longerList.size() > 3) {
-                food->setIgnoreCheck(true);
-                food->setIsNeedRemove(false);
-                food->setFoodState(m_movingVertical ?
-                                   FoodState::FOOD_STATE_VERTICAL :
-                                   FoodState::FOOD_STATE_HORIZONTAL);
-            }
+        }
+    }
+    else{
+        if (dropCheck()) {
+            m_canRemove = true;
         }
     }
 }
@@ -781,10 +946,6 @@ void PlayLayer::onStateRemove()
             {
                 explodeSpecialVer(food->getPosition());
             }
-            else if (food->getFoodState() == FoodState::FOOD_STATE_EXPLODE)
-            {
-                // 功能待加入
-            }
             
             // 2. self
             food->removeOneLife();
@@ -794,5 +955,18 @@ void PlayLayer::onStateRemove()
         }
     }
     
+    // reset ingnore flag
+    FoodSprite *food=NULL;
+    for (int i = 0; i < m_height * m_width; i++) {
+        food = m_matrix[i];
+        if (!food) {
+            continue;
+        }
+        food->setIgnoreCheck(false);
+    }
+    
     m_canRemove = false;
+    m_isSwaped = false;
+    m_srcFood = NULL;
+    m_destFood = NULL;
 }

@@ -55,16 +55,17 @@ private:
     FoodType getFoodTypeByIndex(int idx = 0);
     
     void swapFood();
+    bool isEnableSwap();
     
-    /*根据当前食物状态标记将要移除的食物：
-     N：本身
-     H：水平
-     V：竖直
-     E：3X3
-     */
+    void markList(std::list<FoodSprite *> &chainList);
     void markRemoveHor(FoodSprite *food);
     void markRemoveVer(FoodSprite *food);
-    void markRemove(FoodSprite *food);
+    void markRemoveSame(FoodSprite *food);
+    void markRemoveExplode(FoodSprite *food);
+    void markRemoveNormal(FoodSprite *food);
+    
+    bool swapCheck();
+    bool dropCheck();
     
     FSM* mFSM;
     
@@ -87,6 +88,8 @@ private:
     bool m_movingVertical;// true: 4消除产生纵向炸弹.  false: 4消除产生横向炸弹.
     
     Node* m_node;
+    
+    bool m_isSwaped;
 };
 
 #endif /* defined(__PlayLayer_H__) */

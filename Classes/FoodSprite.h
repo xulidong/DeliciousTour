@@ -22,6 +22,7 @@
 #define __FoodSprite_H__
 
 #include "cocos2d.h"
+#include "BaseFood.h"
 
 USING_NS_CC;
 
@@ -31,47 +32,21 @@ enum class FoodState{
     FOOD_STATE_HORIZONTAL,
     FOOD_STATE_VERTICAL,
     FOOD_STATE_EXPLODE,
-    FOOD_STATE_SAME,
-    FOOD_STATE_BRING,
     FOOD_STATE_MAX
 } ;
 
-enum class FoodType{
-    FOOD_TYPE_NONE,
-    FOOD_TYPE_1 = FOOD_TYPE_NONE,
-    FOOD_TYPE_2,
-    FOOD_TYPE_3,
-    FOOD_TYPE_4,
-    FOOD_TYPE_5,
-    FOOD_TYPE_6,
-    FOOD_TYPE_MAX
-};
-
-class FoodSprite :  public Sprite
+class FoodSprite :  public BaseFood
 {
 public:
     FoodSprite();
-	static FoodSprite *create(FoodType type,int row, int col);
-    static float getContentWidth();
-    static float getContentHeight();
+    ~FoodSprite();
+    bool init(FoodType type,int row, int col);
+    static FoodSprite *create(FoodType type,int row, int col);
     
-    CC_SYNTHESIZE(int, m_row, Row);
-    CC_SYNTHESIZE(int, m_col, Col);
+    CC_PROPERTY(FoodState, m_foodState, FoodState);
     
-    CC_SYNTHESIZE(FoodType, m_foodType, FoodType);
-    
-    CC_SYNTHESIZE_READONLY(FoodState, m_foodState, FoodState);
-    void setFoodState(FoodState mode);
-    
-    CC_SYNTHESIZE_READONLY(int, m_life, Life);
-    void setLife(int life);
-    void removeOneLife(int count = 1);
-    
-    // 标记是否可以移除一次，移除一次生命值减一
-    CC_SYNTHESIZE(bool, m_isNeedRemove, IsNeedRemove);
-    
-    //新产生的4消寿司，本轮不被消除
-    CC_SYNTHESIZE(bool, m_ignoreCheck, IgnoreCheck);
+protected:
+    void addChildOnFood(std::string filename);
 };
 
 #endif

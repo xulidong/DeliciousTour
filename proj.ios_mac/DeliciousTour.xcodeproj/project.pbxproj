@@ -80,6 +80,7 @@
 		9A94C5491945938A002CB79B /* TimeManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C52F1945938A002CB79B /* TimeManager.cpp */; };
 		9A94C54A1945938A002CB79B /* WelcomeScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C5311945938A002CB79B /* WelcomeScene.cpp */; };
 		9A94C54B1945938A002CB79B /* WinState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A94C5331945938A002CB79B /* WinState.cpp */; };
+		9AE45E4E195135E100ED3EF6 /* BaseFood.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AE45E4C195135E100ED3EF6 /* BaseFood.cpp */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
 		BF1C47F01293687400B63C5D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1C47EA1293683800B63C5D /* QuartzCore.framework */; };
@@ -327,6 +328,8 @@
 		9A94C5321945938A002CB79B /* WelcomeScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WelcomeScene.h; path = ../Classes/WelcomeScene.h; sourceTree = "<group>"; };
 		9A94C5331945938A002CB79B /* WinState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WinState.cpp; path = ../Classes/WinState.cpp; sourceTree = "<group>"; };
 		9A94C5341945938A002CB79B /* WinState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WinState.h; path = ../Classes/WinState.h; sourceTree = "<group>"; };
+		9AE45E4C195135E100ED3EF6 /* BaseFood.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BaseFood.cpp; path = ../Classes/BaseFood.cpp; sourceTree = "<group>"; };
+		9AE45E4D195135E100ED3EF6 /* BaseFood.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseFood.h; path = ../Classes/BaseFood.h; sourceTree = "<group>"; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BF170DB412928DE900B8313A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		BF1C47EA1293683800B63C5D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -420,6 +423,8 @@
 				9A94C50E1945938A002CB79B /* FlashScene.h */,
 				9A94C50F1945938A002CB79B /* FoodSprite.cpp */,
 				9A94C5101945938A002CB79B /* FoodSprite.h */,
+				9AE45E4C195135E100ED3EF6 /* BaseFood.cpp */,
+				9AE45E4D195135E100ED3EF6 /* BaseFood.h */,
 				9A94C5111945938A002CB79B /* FSM.cpp */,
 				9A94C5121945938A002CB79B /* FSM.h */,
 				9A94C5131945938A002CB79B /* ImagesDefine.h */,
@@ -788,6 +793,7 @@
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				9A94C54A1945938A002CB79B /* WelcomeScene.cpp in Sources */,
+				9AE45E4E195135E100ED3EF6 /* BaseFood.cpp in Sources */,
 				1AFAF8B716D35DE700DB1158 /* AppDelegate.cpp in Sources */,
 				9A94C5481945938A002CB79B /* TextManager.cpp in Sources */,
 				9A94C5401945938A002CB79B /* PlayerData.cpp in Sources */,
