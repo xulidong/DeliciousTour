@@ -17,7 +17,6 @@ namespace CommonFunction
         ss << num;
         if(!ss.good()){
             cout<<"error CommonFunction::num2str"<<endl;
-            exit(1);
         }
         ss >> str;
         
@@ -31,7 +30,6 @@ namespace CommonFunction
         stringstream ss;
         if(!ss.good()){
             cout<<"error CommonFunction::str2num"<<endl;
-            exit(1);
         }
         ss<<str;
         ss>>num;
@@ -47,7 +45,6 @@ namespace CommonFunction
         ss<<src;
         if(!ss.good()){
             cout<<"error CommonFunction::convert"<<endl;
-            exit(1);
         }
         ss>>dst;
         

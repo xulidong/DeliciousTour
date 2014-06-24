@@ -34,7 +34,7 @@ public:
 private:
     void initMatrix();
     
-    void createAndDropFood(FoodType type, int row, int col, bool isInit = false);
+    void createAndDropFood(FoodType type, int row, int col, int idx);
     void createAndAddTiles(int row, int col);
     
     void getDestFood(Touch *touch);
@@ -63,9 +63,9 @@ private:
     void markRemoveSame(FoodSprite *food);
     void markRemoveExplode(FoodSprite *food);
     void markRemoveNormal(FoodSprite *food);
-    
-    bool swapCheck();
-    bool dropCheck();
+    bool swapRemoveMark();
+    bool dropRemoveMark();
+    bool createSpecialFood(FoodSprite *food, std::list<FoodSprite *> &colList, std::list<FoodSprite *> &rowList);
     
     FSM* mFSM;
     

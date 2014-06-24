@@ -104,7 +104,7 @@ void PlayLayer::initMatrix()
 		for (int col = 0; col < m_width; col++) {
             createAndAddTiles(row, col);
             int idx = row * m_width + col;
-            createAndDropFood(getFoodTypeByIndex(idx) ,row, col, true);
+            createAndDropFood(getFoodTypeByIndex(idx) ,row, col, row);
         }
     }
 }
@@ -494,10 +494,13 @@ void PlayLayer::markRemoveSame(FoodSprite *food){
 
 void PlayLayer::markRemoveExplode(FoodSprite *food){
 
-    int row = (food->getRow()-1 >= 0)?(food->getRow()-1):(food->getRow());
-    int col = (food->getCol()-1 >= 0)?(food->getCol()-1):(food->getCol());
-    for (; row < food->getRow()+1 && row < m_height ; ++row) {
-        for (;col < food->getRow()+1 && col < m_width ; ++col ) {
+    int row_min = MAX(food->getRow()-1, 0);
+    int col_min = MAX(food->getCol()-1, 0);
+    int row_max = MIN(food->getRow()+1, m_height);
+    int col_max = MIN(food->getCol()+1, m_width);
+    
+    for (int row = row_min; row <= row_max; ++row) {
+        for (int col = col_min; col <= col_max; ++col) {
             FoodSprite *tmp = m_matrix[row * m_width + col];
             if (!tmp || tmp == food) {
                 continue;
@@ -541,20 +544,116 @@ void PlayLayer::markRemoveNormal(FoodSprite *food)
     }
 }
 
+bool PlayLayer::swapRemoveMark()
+{
+    
+    if (m_srcFood == NULL || m_destFood == NULL) {
+        return false;
+    }
+    
+    bool ret = false;
+    
+    // same
+    if(m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME ||
+       m_destFood->getFoodType() == FoodType::FOOD_TYPE_SAME )
+    {
+        if (m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME) {
+            m_srcFood->setIsNeedRemove(true);
+            markRemoveSame(m_destFood);
+        }else{
+            m_destFood->setIsNeedRemove(true);
+            markRemoveSame(m_srcFood);
+        }
+        
+        ret = true;
+    }
+    
+    // normal
+    
+    // m_srcFood
+    std::list<FoodSprite *> colSrcList;
+    getColChain(m_srcFood, colSrcList);
+    if (colSrcList.size() >= 3) {
+        markList(colSrcList);
+        ret = true;
+    }
+    
+    std::list<FoodSprite *> rowSrcList;
+    getRowChain(m_srcFood, rowSrcList);
+    if (rowSrcList.size() >= 3) {
+        markList(rowSrcList);
+        ret = true;
+    }
+    
+    createSpecialFood(m_srcFood, colSrcList, rowSrcList);
+    
+    // m_destFood
+    std::list<FoodSprite *> colDestList;
+    getColChain(m_destFood, colDestList);
+    if (colDestList.size() >= 3) {
+        markList(colDestList);
+        ret = true;
+    }
+    
+    std::list<FoodSprite *> rowDestList;
+    getRowChain(m_destFood, rowDestList);
+    if (rowDestList.size() >= 3) {
+        markList(rowDestList);
+        ret = true;
+    }
+    
+    createSpecialFood(m_destFood, colDestList, rowDestList);
+    
+    return ret;
+}
+
+bool PlayLayer::dropRemoveMark(){
+    bool ret = false;
+    
+    FoodSprite* food;
+    for (int i = 0; i < m_height * m_width; i++)
+    {
+        food = m_matrix[i];
+        if ( !food || food->getIsNeedRemove() || food->getIgnoreCheck() ) {
+            continue;
+        }
+        
+        // start count chain
+        std::list<FoodSprite *> colChainList;
+        getColChain(food, colChainList);
+        
+        std::list<FoodSprite *> rowChainList;
+        getRowChain(food, rowChainList);
+        
+        std::list<FoodSprite *> &longerList = (colChainList.size() > rowChainList.size() ) ? colChainList : rowChainList;
+        if (longerList.size() >= 3){
+            markList(longerList);
+            ret = true;
+        }
+    }
+    return ret;
+}
+
 //******************************************************************************
 // Fill Function
 //******************************************************************************
 #pragma mark - Fill Function
-void PlayLayer::createAndDropFood(FoodType type, int row, int col, bool isInit)
+void PlayLayer::createAndDropFood(FoodType type, int row, int col, int idx)
 {
     FoodSprite *food = FoodSprite::create(type, row, col);
     Point endPosition = positionOfItem(row, col);
-    Point startPosition = isInit ? Point(endPosition.x, endPosition.y + SIZE_H/2) : positionOfItem(m_height, col);
+    Point startPosition = positionOfItem(m_height, col);
     food->setPosition(startPosition);
     spriteSheet->addChild(food);// add to BatchNode
     
-    float dt = isInit ? DROP_TIME(SIZE_H/2) : DROP_TIME(startPosition.y - endPosition.y);
-    food->runAction(MoveTo::create(dt, endPosition));
+    float dt = DROP_TIME(startPosition.y - endPosition.y);
+    auto move = MoveTo::create(dt, endPosition);
+    
+    float time = idx * DROP_TIME(FoodSprite::getContentWidth() + FOOD_GAP);
+    auto delay = DelayTime::create(time);
+    
+    auto seq = Sequence::create(delay, move, NULL);
+    food->runAction(seq);
 
     m_matrix[row * m_width + col] = food;
 }
@@ -768,88 +867,39 @@ FSM* PlayLayer::getFSM()
  }
  
  */
-bool PlayLayer::swapCheck()
+bool PlayLayer::createSpecialFood(FoodSprite *food, std::list<FoodSprite *> &colList, std::list<FoodSprite *> &rowList)
 {
-    
-    if (m_srcFood == NULL || m_destFood == NULL) {
-        return false;
-    }
-    
-    bool ret = false;
-    
-    // same
-    if(m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME ||
-       m_destFood->getFoodType() == FoodType::FOOD_TYPE_SAME )
-    {
-        if (m_srcFood->getFoodType() == FoodType::FOOD_TYPE_SAME) {
-            markRemoveSame(m_destFood);
-        }else{
-            markRemoveSame(m_srcFood);
-        }
-        
-        ret = true;
-    }
-    
-    // normal
-    
-    // m_srcFood
-    std::list<FoodSprite *> colSrcList;
-    getColChain(m_srcFood, colSrcList);
-    if (colSrcList.size() >= 3) {
-        markList(colSrcList);
-        ret = true;
-    }
-    
-    std::list<FoodSprite *> rowSrcList;
-    getRowChain(m_srcFood, rowSrcList);
-    if (rowSrcList.size() >= 3) {
-        markList(rowSrcList);
-        ret = true;
-    }
-    
-    // m_destFood
-    std::list<FoodSprite *> colDestList;
-    getColChain(m_destFood, colDestList);
-    if (colDestList.size() >= 3) {
-        markList(colDestList);
-        ret = true;
-    }
-    
-    std::list<FoodSprite *> rowDestList;
-    getRowChain(m_destFood, rowDestList);
-    if (rowDestList.size() >= 3) {
-        markList(rowDestList);
-        ret = true;
-    }
-    
-    return ret;
-}
-
-bool PlayLayer::dropCheck(){
-    bool ret = false;
-    
-    FoodSprite* food;
-    for (int i = 0; i < m_height * m_width; i++)
-    {
-        food = m_matrix[i];
-        if ( !food || food->getIsNeedRemove() || food->getIgnoreCheck() ) {
-            continue;
-        }
-        
-        // start count chain
-        std::list<FoodSprite *> colChainList;
-        getColChain(food, colChainList);
-        
-        std::list<FoodSprite *> rowChainList;
-        getRowChain(food, rowChainList);
-        
-        std::list<FoodSprite *> &longerList = (colChainList.size() > rowChainList.size() ) ? colChainList : rowChainList;
-        if (longerList.size() >= 3){
-            markList(longerList);
-            ret = true;
+    // create explode food
+    if (colList.size() >= 3 && rowList.size() >= 3) {
+        if (food == m_srcFood || food == m_destFood) {
+            food->setIgnoreCheck(true);
+            food->setIsNeedRemove(false);
+            food->setFoodState(FoodState::FOOD_STATE_EXPLODE);
+            return true;
         }
     }
-    return ret;
+    
+    // create same food
+    if (colList.size() == 5 || rowList.size() == 5) {
+        if (food == m_srcFood || food == m_destFood) {
+            food->setIgnoreCheck(true);
+            food->setIsNeedRemove(false);
+            food->setFoodType(FoodType::FOOD_TYPE_SAME);
+        }
+    }
+    
+    // create line food
+    if (colList.size() == 4 || rowList.size() == 4) {
+        if (food == m_srcFood || food == m_destFood) {
+            food->setIgnoreCheck(true);
+            food->setIsNeedRemove(false);
+            food->setFoodState(m_movingVertical ?
+                               FoodState::FOOD_STATE_VERTICAL :
+                               FoodState::FOOD_STATE_HORIZONTAL);
+        }
+    }
+    
+    return false;
 }
 
 void PlayLayer::onStateReady()
@@ -858,12 +908,12 @@ void PlayLayer::onStateReady()
 
     // 1. check remove
     if (m_isSwaped) {
-        if (swapCheck()) {
+        if (swapRemoveMark()) {
             m_canRemove = true;
         }
     }
     else{
-        if (dropCheck()) {
+        if (dropRemoveMark()) {
             m_canRemove = true;
         }
     }
@@ -872,6 +922,7 @@ void PlayLayer::onStateReady()
 void PlayLayer::onStateDrop()
 {
     CCLOG("drop");
+    
     // reset moving direction flag
     m_movingVertical = true;
     m_isAnimationing = true;
@@ -881,27 +932,33 @@ void PlayLayer::onStateDrop()
     
     // 1. drop exist food
     FoodSprite *food = NULL;
-    for (int col = 0; col < m_width; col++) {
+    for (int col = 0; col < m_width; col++)
+    {
         int removedFoodOfCol = 0;
         // from bottom to top
-        for (int row = 0; row < m_height; row++) {
+        for (int row = 0; row < m_height; row++)
+        {
             food = m_matrix[row * m_width + col];
             if (NULL == food) {
                 removedFoodOfCol++;
             }
-            else {
+            else
+            {
                 if (removedFoodOfCol > 0) {
                     // every item have its own drop distance
                     int newRow = row - removedFoodOfCol;
+                    
                     // switch in matrix
                     m_matrix[newRow * m_width + col] = food;
                     m_matrix[row * m_width + col] = NULL;
+                    
                     // move to new position
                     Point startPosition = food->getPosition();
                     Point endPosition = positionOfItem(newRow, col);
                     float dt = DROP_TIME(startPosition.y - endPosition.y);
                     food->stopAllActions();
                     food->runAction(MoveTo::create(dt, endPosition));
+                    
                     // set the new row to item
                     food->setRow(newRow);
                 }
@@ -914,8 +971,10 @@ void PlayLayer::onStateDrop()
     
     // 2. create new item and drop down.
     for (int col = 0; col < m_width; col++) {
+        int idx = 0;
         for (int row = m_height - colEmptyInfo[col]; row < m_height; row++) {
-            createAndDropFood(getFoodTypeRand(),row, col);
+            createAndDropFood(getFoodTypeRand(),row, col, idx);
+            ++idx;
         }
     }
     
