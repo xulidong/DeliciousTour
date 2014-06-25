@@ -36,7 +36,7 @@ public:
     
     CC_SYNTHESIZE_READONLY(int, m_life, Life);
     void setLife(int life);
-    void removeOneLife(int count = 1);
+    void removeLife(int count = 1);
     
     // 标记是否可以移除一次，移除一次生命值减一
     CC_SYNTHESIZE(bool, m_isNeedRemove, IsNeedRemove);

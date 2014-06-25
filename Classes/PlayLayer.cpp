@@ -70,13 +70,11 @@ bool PlayLayer::init(int level)
     // add mask
     auto clip = ClippingNode::create();
     clip->setInverted(true);
-    clip->setAlphaThreshold(1);
+    clip->setAlphaThreshold(0);
     this->addChild(clip);
-    
-    auto back = Sprite::create("background.png");//LayerColor::create(Color4B(128,128,128,255));
-    back->ignoreAnchorPointForPosition(false);
-    back->setAnchorPoint(Point(0, 1));
-    back->setPosition(Point(0, SIZE_H));
+
+    auto back = Sprite::create("background.png");
+    back->setPosition(SIZE_MID_POS);
     clip->addChild(back);
     
     m_node = Node::create();
@@ -425,7 +423,7 @@ void PlayLayer::markList(std::list<FoodSprite *> &chainList){
     }
 }
 
-void PlayLayer::markRemoveHor(FoodSprite *food)
+void PlayLayer::markRemoveVer(FoodSprite *food)
 {
     for (int row = 0; row < m_height; row++) {
         FoodSprite *tmp = m_matrix[row * m_width + food->getCol()];
@@ -445,7 +443,7 @@ void PlayLayer::markRemoveHor(FoodSprite *food)
     }
 }
 
-void PlayLayer::markRemoveVer(FoodSprite *food)
+void PlayLayer::markRemoveHor(FoodSprite *food)
 {
     for (int col = 0; col < m_width; col++) {
         FoodSprite *tmp = m_matrix[food->getRow() * m_width + col];
@@ -1007,7 +1005,7 @@ void PlayLayer::onStateRemove()
             }
             
             // 2. self
-            food->removeOneLife();
+            food->removeLife();
             if (food->getLife() == 0) {
                 explodeFood(food);
             }

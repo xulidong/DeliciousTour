@@ -4,6 +4,12 @@
 
 USING_NS_CC;
 
+#define RW (640.0f)
+#define RH (1136.0f)
+
+#define DW (640.0f)
+#define DH (1136.0f)
+
 AppDelegate::AppDelegate() {
 
 }
@@ -20,18 +26,23 @@ bool AppDelegate::applicationDidFinishLaunching() {
         glview = GLView::create("foodtrip");
         director->setOpenGLView(glview);
     }
-
-    // turn on display FPS
-    director->setDisplayStats(true);
-
-    // set FPS. the default value is 1.0/60 if you don't call this
-    director->setAnimationInterval(1.0 / 60);
-
+    
+    // multi screen
+    glview->setDesignResolutionSize(DW, DH, ResolutionPolicy::FIXED_WIDTH);
+    
     // add file path
     std::vector<std::string> searchPath;
     searchPath.push_back("images");
     searchPath.push_back("configs");
     CCFileUtils::getInstance()->setSearchPaths(searchPath);
+    
+    director->setContentScaleFactor(RW/DW);
+    
+    // turn on display FPS
+    director->setDisplayStats(true);
+
+    // set FPS. the default value is 1.0/60 if you don't call this
+    director->setAnimationInterval(1.0 / 60);
     
     // read player data
     PlayerData::getInstance()->readFromFile();

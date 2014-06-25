@@ -9,22 +9,22 @@ obj/local/armeabi/objs/cocos2dcpp_shared/__/__/Classes/PlayScene.o: \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCPlatformMacros.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/ccConfig.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCPlatformDefine.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/log.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/log.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCRefPtr.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCRef.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/ccMacros.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCConsole.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/select.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
  /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/thread \
  /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
  /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/map \
  /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/mutex \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCStdC.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/math.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/stdlib.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/alloca.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/strings.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/memory.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/math.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/stdlib.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/alloca.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/strings.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/memory.h \
  /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCVector.h \
  /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/algorithm \
@@ -55,10 +55,10 @@ obj/local/armeabi/objs/cocos2dcpp_shared/__/__/Classes/PlayScene.o: \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/ccMacros.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/ccTypes.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCGL.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2platform.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/KHR/khrplatform.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2ext.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCConfiguration.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCValue.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCDirector.h \
@@ -87,14 +87,14 @@ obj/local/armeabi/objs/cocos2dcpp_shared/__/__/Classes/PlayScene.o: \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./renderer/CCRenderCommandPool.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCScheduler.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/uthash.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/inttypes.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/base64.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/ZipUtils.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCFileUtilsAndroid.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/CCFileUtils.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCData.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/jni.h \
- /Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/asset_manager.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/jni.h \
+ /Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/asset_manager.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCProfiling.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCMap.h \
  /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCConsole.h \
@@ -418,7 +418,7 @@ jni/../../Classes/CommonHeader.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCPlatformDefine.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/log.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/log.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCRefPtr.h:
 
@@ -428,7 +428,7 @@ jni/../../Classes/CommonHeader.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCConsole.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/sys/select.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h:
 
 /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/thread:
 
@@ -440,15 +440,15 @@ jni/../../Classes/CommonHeader.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCStdC.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/math.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/math.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/stdlib.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/stdlib.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/alloca.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/alloca.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/strings.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/strings.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/memory.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/memory.h:
 
 /Users/Macmini/Documents/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert:
 
@@ -510,13 +510,13 @@ jni/../../Classes/CommonHeader.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./platform/android/CCGL.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2platform.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/KHR/khrplatform.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/GLES2/gl2ext.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCConfiguration.h:
 
@@ -574,7 +574,7 @@ jni/../../Classes/CommonHeader.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/uthash.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/inttypes.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/base64.h:
 
@@ -586,9 +586,9 @@ jni/../../Classes/CommonHeader.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCData.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/jni.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/jni.h:
 
-/Users/Macmini/Documents/android-ndk-r9d/platforms/android-9/arch-arm/usr/include/android/asset_manager.h:
+/Users/Macmini/Documents/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/asset_manager.h:
 
 /Users/Macmini/Documents/CocosProjects/DeliciousTour/proj.android/../cocos2d/cocos/./base/CCProfiling.h:
 

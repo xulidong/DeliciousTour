@@ -92,7 +92,7 @@ FoodType BaseFood::getFoodType(){
     return m_foodType;
 }
 
-void BaseFood::removeOneLife(int count)
+void BaseFood::removeLife(int count)
 {
     if (m_life>0) {
         m_life -= count;
